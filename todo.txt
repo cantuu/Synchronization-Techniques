@@ -1,0 +1,36 @@
+TO DO LIST 
+
+- Robustez ao ruído - Contagem de número de vezes que o sinal se perde ('a' não é necessário, e sim o tamanho do sinal).
+	- Códigos que olham deleção (deletion channel codes)
+
+-------------------------------- DONE ---------------------------------
+- Variação dos parâmetros (mi, tau, samples do Early-Late) com SNR alta
+-----------------------------------------------------------------------
+
+- Ver até quando o método aguenta com sps variando
+
+- BER em função do SNR 
+	- Valor real do SPS, sem variações.
+	- Comparar com a curva teórica (qfunc)
+	- Alteração SNR para Eb_N0 (no plot também)
+
+- Mi se perdendo no Early-Late Decided.
+
+- Corrigir o BUG do GARDNER.
+
+- Jitter
+
+- Rayleigh Channel.
+
+- Variação de modulações.
+
+- Mudar pulso para cosseno levantado. (Raiz quadrada do cosseno levantado no Rx e no Tx)
+
+- S-curve (Mengali)
+
+
+
+Pra semana que vem:
+	- Esqueleto TCC;
+
+
