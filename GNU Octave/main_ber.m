@@ -15,8 +15,8 @@ mi = 0.5;
 snr_db = 0;
 
 delta = 0; #Atraso sinal.
-a = 5;
-SNR = [-10:1:14];
+a = 15;
+SNR = [-15:1:14];
 erros_el = zeros(a,length(SNR)); erros_el_dec = zeros(a,length(SNR)); erros_el_nda = zeros(a,length(SNR));
 erros_gard = zeros(a,length(SNR)); erros_gard_dec = zeros(a,length(SNR));
 erros_mm = zeros(a,length(SNR));
@@ -57,16 +57,20 @@ erros_el_mean_n = mean(erros_el_nda);
 erros_gard_mean_d = mean(erros_gard_dec);
 erros_mm_mean = mean(erros_mm);
 
-subplot(131)
-semilogy(SNR, erros_el_mean/length(bits), 'b'); axis([-15 15 0 1000]); hold on; grid on;
-semilogy(SNR, erros_el_mean_d/length(bits), 'r'); axis([-15 15 0 1000])
-semilogy(SNR, erros_el_mean_n/length(bits), 'g'); axis([-15 15 0 1000]); hold off; grid off;
-legend('Early-Late', 'Early-Late Decided', 'Early-Late NDA');
+semilogy(SNR, erros_el_mean/length(bits))
+figure(2)
+plot(SNR, erros_el_mean)
 
-subplot(132)
-semilogy(SNR, erros_mm_mean/length(bits), 'r'); axis([-15 15 0 1000]);
-legend('Muller & Muller');
-
-subplot(133)
-semilogy(SNR, erros_gard_mean_d/length(bits), 'r'); axis([-15 15 0 1000]);
-legend('Gardner Decided');
+%subplot(131)
+%plot(SNR, erros_el_mean, 'b'); axis([-15 15 0 600]); hold on; grid on;
+%plot(SNR, erros_el_mean_d, 'r'); axis([-15 15 0 600])
+%plot(SNR, erros_el_mean_n, 'g'); axis([-15 15 0 600]); hold off; grid off;
+%legend('Early-Late', 'Early-Late Decided', 'Early-Late NDA');
+%
+%subplot(132)
+%plot(SNR, erros_mm_mean, 'r'); axis([-15 15 0 600]);
+%legend('Muller & Muller');
+%
+%subplot(133)
+%plot(SNR, erros_gard_mean_d, 'r'); axis([-15 15 0 600]);
+%legend('Gardner Decided');
