@@ -5,6 +5,11 @@ This work presents implementations, analysis and comparison of symbol synchroniz
 
 ## Running the tests
 
-## Authors
+## Analysis Already Completed
+- Parameters variation with high signal-noise relation (mi, tau and Early-Late's samples);
+- In Early-Late Decided, doesn't matter how many samples are inserted in synchronizator, because the way that the algorithm is written, with decided symbols, will always tend to synchronism.
 
+## Authors
+- Gabriel Cozer Cantu, Telecommunication Engeneering Student;
+- Roberto Wanderley da Nóbreba, Professor at Instituto Federal de Santa Catarina - Campus São José (github.com/rwnobrega)
 

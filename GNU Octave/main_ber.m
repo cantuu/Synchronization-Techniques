@@ -15,7 +15,7 @@ mi = 0.5;
 snr_db = 0;
 
 delta = 0; #Atraso sinal.
-a = 15;
+a = 5;
 SNR = [-15:1:14];
 erros_el = zeros(a,length(SNR)); erros_el_dec = zeros(a,length(SNR)); erros_el_nda = zeros(a,length(SNR));
 erros_gard = zeros(a,length(SNR)); erros_gard_dec = zeros(a,length(SNR));
@@ -57,7 +57,12 @@ erros_el_mean_n = mean(erros_el_nda);
 erros_gard_mean_d = mean(erros_gard_dec);
 erros_mm_mean = mean(erros_mm);
 
-semilogy(SNR, erros_el_mean/length(bits))
+semilogy(SNR, erros_el_mean/length(bits), 'b'); hold on;
+semilogy(SNR, erros_el_mean_d/length(bits), 'r');
+semilogy(SNR, erros_el_mean_n/length(bits), 'g'); 
+legend('Early-Late', 'Early-Late Decided', 'Early-Late NDA');
+
+
 figure(2)
 plot(SNR, erros_el_mean)
 

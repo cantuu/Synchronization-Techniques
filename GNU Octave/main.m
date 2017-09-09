@@ -71,10 +71,10 @@ conv_g = zeros(a,length(SNR)); conv_g_d = zeros(a,length(SNR));
 
 
 
-%%%% Analise Samples Early-Late %%%%
-samp = [1:30];
+%%% Analise Samples Early-Late %%%%
+samp = [1:35];
 snr_el = 100;
-a1 = 150;
+a1 = 10;
 conv_el1 = zeros(a1,length(samp)); conv_el_dec1 = zeros(a1,length(samp)); 
 conv_el_nda1 = zeros(a1,length(samp));
 for j = 1:a1
@@ -97,7 +97,7 @@ conv_el1_nda_avg = mean(conv_el1_nda);
 
 figure(2); title('Variaçao numero amostas Early-Late com SNR Fixa');
 subplot(131); plot(samp, conv_el1_avg); legend('Early-Late');
-subplot(132); plot(samp, conv_el1_dec_avg); legend('Early-Late Decided');
+subplot(132); plot(samp, conv_el1_dec_avg); axis([1 length(samp) 0 1000]); legend('Early-Late Decided');
 subplot(133); plot(samp, conv_el1_nda_avg); legend('Early-Late NDA');
 
 
@@ -159,12 +159,12 @@ tau_gard_dec = zeros(a2,length(tau_test)); tau_mm = zeros(a2,length(tau_test));
 
 %%%% Analise Velocidade Convergencia Variando MI %%%%
 snr_db = 100;
-a3 = 100;
+a3 = 50;
 mi_test = [0:0.05:1];
 mi_el = zeros(a3,length(mi_test)); mi_el_dec = zeros(a3,length(mi_test)); 
 mi_el_nda = zeros(a3,length(mi_test)); mi_gard = zeros(a3,length(mi_test)); 
 mi_gard_dec = zeros(a3,length(mi_test)); mi_mm = zeros(a3,length(mi_test));
-%
+
 %for j = 1:a3
 %   for i = 1:length(mi_test)
 %      y_mi = tx_chan(N, sps, snr_db);      
