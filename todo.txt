@@ -10,8 +10,6 @@ TO DO LIST
 	- Comparar com a curva teórica (qfunc)
 	- Alteração SNR para Eb_N0 (no plot também)
 
-- Corrigir o BUG do GARDNER.
-
 - Jitter
 
 - Rayleigh Channel.
@@ -24,7 +22,9 @@ TO DO LIST
 
 
 -------------------------------- DONE ---------------------------------
-- Variação dos parâmetros (mi, tau, samples do Early-Late) com SNR alta
+- Variação dos parâmetros (mi, tau, samples do Early-Late) com SNR alta;
+
+- Corrigir o BUG do GARDNER;
 
 - Verificar a quantidade de amostras no Early-Late Decided, para se perder...
 -----------------------------------------------------------------------
