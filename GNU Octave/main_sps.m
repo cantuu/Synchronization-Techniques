@@ -16,7 +16,7 @@ Eb_N0 = 100;
 
 SPS = [sps-4:0.1:sps+4];
 
-a = 50;
+a = 2;
 conv_el = zeros(a,length(SPS)); conv_el_dec = zeros(a,length(SPS)); 
 conv_el_nda = zeros(a,length(SPS)); conv_mm = zeros(a,length(SPS));
 conv_g = zeros(a,length(SPS)); conv_g_d = zeros(a,length(SPS));
@@ -43,7 +43,7 @@ for j = 1:a
       instants5 = gardner(y1, SPS(i), tau, mi);
       conv_g(j,i) = convergencia(y1, instants5, samples, sps);
       
-      instants6 = gardner(y1, SPS(i), tau, mi);
+      instants6 = gardner_decided(y1, SPS(i), tau, mi);
       conv_g_d(j,i) = convergencia(y1, instants6, samples, sps);
   end
 end
@@ -69,6 +69,6 @@ plot(_sps, conv_mm_avg, 'r');
 legend('Muller & Muller');
 
 subplot(133)
-plot(_sps, conv_g_avg, 'g');
+plot(_sps, conv_g_avg, 'g'); hold on
 plot(_sps, conv_g_d_avg, 'r'); hold off
 legend('Gardner', 'Gardner Decided')
