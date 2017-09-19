@@ -3,8 +3,6 @@ TO DO LIST
 - Robustez ao ruído - Contagem de número de vezes que o sinal se perde ('a' não é necessário, e sim o tamanho do sinal).
 	- Códigos que olham deleção (deletion channel codes)
 
-- Ver até quando o método aguenta com sps variando
-
 - BER em função do SNR 
 	- Valor real do SPS, sem variações.
 	- Comparar com a curva teórica (qfunc)
@@ -27,6 +25,8 @@ TO DO LIST
 - Corrigir o BUG do GARDNER;
 
 - Verificar a quantidade de amostras no Early-Late Decided, para se perder...
+
+- Ver até quando o método aguenta com sps variando
 -----------------------------------------------------------------------
 
 

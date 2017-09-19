@@ -31,7 +31,8 @@ if (option == 1)
 
   for j = 1:a  
     for i = 1:length(SNR)
-        y1 = tx_chan(N, sps, SNR(i));      
+        bits = randi([0 1], 1, N);
+        y1 = tx_chan(bits, N, sps, SNR(i), 0);     
         
         instants1 = early_late(y1, sps_, amostras_el, tau, mi);
         conv_el(j,i) = convergencia(y1, instants1, samples, sps);
@@ -85,7 +86,8 @@ elseif(option == 2)
   
   for j = 1:a1
     for i = 1:length(samp)
-       y_el = tx_chan(N, sps, snr_el);      
+       bits = randi([0 1], 1, N);
+       y_el = tx_chan(bits, N, sps, snr_el, 0);     
         
        instants1 = early_late(y_el, sps_, samp(i), tau, mi);
        conv_el1(j,i) = convergencia(y_el, instants1, samples, sps);
@@ -117,7 +119,8 @@ elseif(option == 3)
 
   for j = 1:a2
      for i = 1:length(tau_test)
-         y_tau = tx_chan(N, sps, snr_db);      
+        bits = randi([0 1], 1, N);
+        y_tau = tx_chan(bits, N, sps, snr_db, 0);    
         
         instants1 = early_late(y_tau, sps_, amostras_el, tau_test(i), mi);
         tau_el(j,i) = convergencia(y_tau, instants1, samples, sps);
@@ -172,7 +175,8 @@ elseif(option == 4)
 
   for j = 1:a3
      for i = 1:length(mi_test)
-        y_mi = tx_chan(N, sps, snr_db);      
+        bits = randi([0 1], 1, N);
+        y_mi = tx_chan(bits, N, sps, snr_db, 0);      
         
         instants1 = early_late(y_mi, sps_, amostras_el, tau, mi_test(i));
         mi_el(j,i) = convergencia(y_mi, instants1, samples, sps);

@@ -1,19 +1,17 @@
-function out = tx_chan(N, sps, SNR)
+function out = tx_chan(bits , N, sps, SNR, delta)
 
 %Trem de impulsos - Filtro
 Hs = ones(1,sps);
 Hr = fliplr(Hs);
 
 %Geração sequencia bits
-x = 2*(randi ([0,1], 1, N)) -1;
+x = 2*bits -1;
 
 %Interpolaçao            
 up = upsample (x, sps);
 s = conv(Hs, up);
 s = s(1:N*sps);
 
-%Atraso sinal - ALTERAR PARA ATRASO ALEATORIO
-delta = 5*sps + 21;
 s_atrasado = [zeros(1, delta) s];
 s_atrasado = s_atrasado(1:N*sps);
 
