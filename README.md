@@ -19,6 +19,9 @@ Apesar da importância de sincronizadores em sistemas de comunicações, uma das
 Com uma série de sincronizadores disponíveis para a utilização em sistemas de comunicação, qual deles é o mais indicado a ser utilizado em um determinado cenário? Com o auxílio da ferramenta GNU Octave, o presente trabalho visa responder esta pergunta. Os sincronizadores serão testados em diferentes cenários, onde parâmetros como por exemplo o tipo de modulação empregada, o modelo de canal de transmissão, a quantidade de amostras por símbolos e parâmetros internos dos sincronizadores serão variados, e uma análise de desemprenho será realizada, afim de obter o melhor sincronizador para diferentes casos de uso.
 
 ## Objetivos
+- Desenvolvimento de uma biblioteca de funções de sincronismo de símbolo na plataforma GNU Octave, semelhante a biblioteca já existe na plataforma Matlab, o `comm.SymbolSynchronizer`; 
+- Análise e comparações dos sincronizadores de símbolo em diferentes cenários de comunicação, utilizando a biblioteca previamente desenvolvida; 
+- Submissão de um Patch no GNU Radio, onde todos os sincronizadores desenvolvidos serão submetidos, juntamente com recomendações de parâmetros para a utilização de cenários de rádio definido por software. 
 
 ### Preparando o ambiente
 
