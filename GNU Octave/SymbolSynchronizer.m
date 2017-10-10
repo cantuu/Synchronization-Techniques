@@ -1,28 +1,57 @@
 classdef SymbolSynchronizer
     
-  properties
-    Modulation
-    TimingErrorDetector
-    SamplesPerSymbol
-    DampingFactor
-    NormalizedLoopBandwidth
-    DetectorGain
+  properties (Nontunable)
+    % Especifica o tipo de sincronizador que sera utilizado:
+    % Early-Late (Normal, NDA ou Decided) ou Zero-Crossing
+    % Gardner (Normal ou Decided) ou Mueller & Muller
+    % O default do Matlab eh o Zero-Crossing, porem aqui sera o Mueller & Muller
+    TimingErrorDetector = 'Mueller-Muller';
+    
+    % Especifica o numero de amostras por simbolo, sendo um numero real, inteiro,
+    % escalar e maior igual a 2. O default do Matlab eh 2.
+    SamplesPerSymbol = 2;
   end
   
-  methods
-    function obj = SymbolSynchronizer(modulation, ted, sps, df, nlb, dg)
-      obj.Modulation = modulation;
-      obj.TimingErrorDetector = ted;
-      obj.SamplesPerSymbol = sps;
-      obj.DampingFactor = df;
-      obj.NormalizedLoopBandwidth = nlb;
-      obj.DetectorGain = dg;    
-    end
-    
-    % ... segue as funçoes
+  properties
+    % As seguintes propriedades setam os ganhos proporcionais e intergrais do 
+    % loop filter. Todas elas ja assumem um valor default, caso o usuario nao passe.
+    DampingFactor = 1;
+    NormalizedLoopBandwidth = 0.01;
+    DetectorGain = 2.7;
+  end
+  
+  properties(Constant, Hidden)
+    % Especifica quais os valores que o TimingErrorDetector pode assumir
+    TimingErrorDetectorSet = [...
+        'Early-Late'; 'Early-Late Decided'; 'Early-Late NDA'; ...
+        'Gardner'; 'Gardner Decided'; 'Mueller & Muller'];
   end
 
+  
+  methods
+    % Construtor e inicializaçao de variaveis
+    % ATENÇAO! REALIZAR A VERIFICAÇAO DAS VARIAVEIS (ver se bate com os requisitos...)
+    function obj = SymbolSynchronizer(varargin)
+      for i = 1:length(varargin)
+        if(strcmp(varargin{i}, 'TimingErrorDetector'))
+          obj.TimingErrorDetector = varargin{i+1};
+        elseif(strcmp(varargin{i}, 'SamplesPerSymbol'))
+          obj.SamplesPerSymbol = varargin{i+1};  
+        elseif(strcmp(varargin{i}, 'DampingFactor'))
+          obj.DampingFactor = varargin{i+1};
+        elseif(strcmp(varargin{i}, 'NormalizedLoopBandwidth'))
+          obj.NormalizedLoopBandwidth  = varargin{i+1};
+        elseif(strcmp(varargin{i}, 'DetectorGain'))
+          obj.DetectorGain = varargin{i+1};
+        end  
+      end  
+    end
+  
+  
+  end
+  
 end
 
-% Exemplo de Construtor:
-%   a = SymbolSynchronizer('BPSK', 'Early-Late', 2, 1, 0.01, 2.7)
+% Exemplo de Construtor
+% a = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', ...
+%     5, 'DampingFactor', 0.5, 'NormalizedLoopBandwidth', 0.005, 'DetectorGain', 2)
