@@ -47,10 +47,15 @@ classdef SymbolSynchronizer
       end  
     end
   
+    function s = step(obj, x)
+      printf("%d", x)
+    end 
   
-  end
+  end % methods
   
-end
+end %class
+
+% [EOF]
 
 % Exemplo de Construtor
 % a = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', ...
