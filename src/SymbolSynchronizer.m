@@ -48,7 +48,7 @@ classdef SymbolSynchronizer
     end
   
     function s = step(obj, x)
-      printf("%d", x)
+      printf("%d\n", x)
     end 
   
   end % methods
