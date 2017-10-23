@@ -1,36 +1,23 @@
-function b = squarerootrcosfilter(beta, span, sps)
+% Adapted from Mathuranathan Viswanathan. The original code can be found in:
+% <https://www.gaussianwaves.com/2011/04/square-root-raised-cosine-filter-matchedsplit-filter-implementation-2/>
 
-  delay = span*sps/2;
-  t = (-delay:delay)/sps;
-  
-  % Find mid-point
-  idx1 = find(t==0);
-  if ~isempty(idx1)
-    b(idx1) = -1 ./ (pi.*sps) .* (pi.*(beta-1) - 4.*beta);
-  end
-  
-  % Find non-zero denominator indices
-  idx2 = find(abs(abs(4.*beta.*t) - 1.0) < sqrt(eps));
-  if ~isempty(idx2)
-    b(idx2) = 1 ./ (2.*pi.*sps) ...
-      * (    pi.*(beta+1)  .* sin(pi.*(beta+1)./(4.*beta)) ...
-      - 4.*beta     .* sin(pi.*(beta-1)./(4.*beta)) ...
-      + pi.*(beta-1)  .* cos(pi.*(beta-1)./(4.*beta)) ...
-      );
-  end
-  
-  % Fill in the zeros denominator indices
-  ind = 1:length(t);
-  ind([idx1 idx2]) = [];
-  nind = t(ind);
-  
-  b(ind) = -4.*beta./sps .* ( cos((1+beta).*pi.*nind) + ...
-    sin((1-beta).*pi.*nind) ./ (4.*beta.*nind) ) ...
-    ./ (pi .* ((4.*beta.*nind).^2 - 1));
+function response=squarerootrcosfilter(roll_off, spam, sps)
+   
+  a=roll_off;
+  t=-spam:1/sps:spam;
 
-  % Normalize filter energy
-  b = b / sqrt(sum(b.^2));  
-    
+  p=zeros(1,length(t));
+  for i=1:1:length(t)
+      if t(i)==0
+          p(i)= (1-a)+4*a/pi;
+      else if t(i)==1/(4*a) || t(i)==-1/(4*a)
+             p(i)=a/sqrt(2)*((1+2/pi)*sin(pi/(4*a))+(1-2/pi)*cos(pi/(4*a)));
+            else
+              p(i) = (sin(pi*t(i)*(1-a))+4*a*t(i).*cos(pi*t(i)*(1+a)))./(pi*t(i).*(1-(4*a*t(i)).^2));
+           end
+      end
+  end
+  response=p./sqrt(sum(p.^2)); %Normalization to unit energy
 end
 
-% [EOF]
+%% [EOF]
