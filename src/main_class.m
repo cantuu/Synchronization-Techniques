@@ -24,8 +24,10 @@ r = awgn(x, SNR, 'measured');                   #Add Noise
 
 y = upfirdn(r, h, 1, 1);                        #Raised Cosine Rx Filter
 y = y(1:N*sps);
+
+
                                                 #Symbol Synchronizer
-instants3 = mueller_and_mueller(y, sps, 1, 0.5);
+instants3 = mmd(y, sps, 1, 0.01);
 
 
 plot(t, y); xlim([0 1000]); grid on;

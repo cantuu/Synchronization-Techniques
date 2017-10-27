@@ -23,13 +23,18 @@ Com uma série de sincronizadores disponíveis para a utilização em sistemas d
 - Análise e comparações dos sincronizadores de símbolo em diferentes cenários de comunicação, utilizando a biblioteca previamente desenvolvida; 
 - Submissão de um Patch no GNU Radio, onde todos os sincronizadores desenvolvidos serão submetidos, juntamente com recomendações de parâmetros para a utilização de cenários de rádio definido por software. 
 
+## Estrutura da Fundamentação Teórica
+- Problemática do Sincronismo de símbolo: O que é, e porque o sincronismo é uma parte fundamental de qualquer sistema de comunicação digital;
+- Principais algoritmos:
+	* Zero Crossing;
+	* Gardner;
+	* Early-Late;
+	* Mueller & Muller;
+- Utilização da plataforma GNU Octave: Qual a motivação da utilização desta plataforma;
+- Utilização da plataforma GNU Radio: De volta ao princípio do projeto. Porque iremos trabalhar em duas plataformas distintas. 
+
 ### Preparando o ambiente
 
 ### Compilando os arquivos
-
-### Analysis Already Completed
-- Parameters variation with high signal-noise relation (mi, tau and Early-Late's samples);
-- In Early-Late Decided, doesn't matter how many samples are inserted in synchronizator, because the way that the algorithm is written, with decided symbols, will always tend to synchronism;
-- Samples per Symbol (sps) variation with high signal-noise relation.
 
 
