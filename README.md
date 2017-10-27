@@ -24,6 +24,7 @@ Com uma série de sincronizadores disponíveis para a utilização em sistemas d
 - Submissão de um Patch no GNU Radio, onde todos os sincronizadores desenvolvidos serão submetidos, juntamente com recomendações de parâmetros para a utilização de cenários de rádio definido por software. 
 
 ## Estrutura da Fundamentação Teórica
+Para atingir todos os objetivos previamente traçados, uma base teórica é fundamental para qualquer projeto que será desenvolvido. A Estrutura da fundamentação teórica deste projeto visa abordar desde os princípios básicos de comunicações digitais e a importância de sincronizadores, até as plataformas em que os mesmos serão implementados no decorrer do trabalho. Os principais tópicos da Estrutura da Fundamentação Teórica são:   
 - Problemática do Sincronismo de símbolo: O que é, e porque o sincronismo é uma parte fundamental de qualquer sistema de comunicação digital;
 - Principais algoritmos:
 	* Zero Crossing;
@@ -34,6 +35,12 @@ Com uma série de sincronizadores disponíveis para a utilização em sistemas d
 - Utilização da plataforma GNU Radio: De volta ao princípio do projeto. Porque iremos trabalhar em duas plataformas distintas. 
 
 ### Preparando o ambiente
+Para a realização das análises propostas por este projeto, é necessário a configuração de um ambiente de trabalho.
+-  Caso você não possua a plataforma GNU Octave instalada em sua máquina, ela pode ser instalada diretamente do [Site Oficial](https://www.gnu.org/software/octave/), onde uma versão mais recente é instalada. Caso você já possua o GNU Octave, verifique a versão do mesmo, pois recomendamos a utilização de uma versão mais recente da plataforma.
+- Além da plataforma, o projeto faz o uso de pacotes extras do GNU Octave, disponibilizados pelo Octave Forge (mais informações podem ser encontradas [aqui](https://octave.sourceforge.io/)). Os pacotes que devem ser instalados são:
+	* [Control](https://octave.sourceforge.io/control/index.html): ;
+	* [Signal](https://octave.sourceforge.io/signal/index.html);
+	* [Symbolic](https://octave.sourceforge.io/symbolic/index.html);
 
 ### Compilando os arquivos
 
