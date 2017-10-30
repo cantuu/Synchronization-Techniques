@@ -5,6 +5,7 @@ classdef SymbolSynchronizer
     % Early-Late (Normal, NDA ou Decided) ou Zero-Crossing
     % Gardner (Normal ou Decided) ou Mueller & Muller
     % O default do Matlab eh o Zero-Crossing, porem aqui sera o Mueller & Muller
+    % (Por enquanto... Zero-Crossing sera implementado)
     TimingErrorDetector = 'Mueller-Muller';
     
     % Especifica o numero de amostras por simbolo, sendo um numero real, inteiro,
@@ -49,6 +50,7 @@ classdef SymbolSynchronizer
   
     function s = step(obj, x)
       printf("%d\n", x)
+      
     end 
   
   end % methods
