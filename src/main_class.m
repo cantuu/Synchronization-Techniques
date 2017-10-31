@@ -5,7 +5,7 @@
 clear all; close all; clc;
 
 N = 1000;
-sps = 4;
+sps = 7;
 SNR = 100;
 
 Rs = 1.0;
@@ -25,13 +25,17 @@ r = awgn(x, SNR, 'measured');                   #Add Noise
 y = upfirdn(r, h, 1, 1);                        #Raised Cosine Rx Filter
 y = y(1:N*sps);
 
-
                                                 #Symbol Synchronizer
-instants3 = mmd(y, sps, 1, 0.01);
+comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps);
+instants3 = step(comm, y);              
 
 
 plot(t, y); xlim([0 1000]); grid on;
 hold on;
 plot(t(instants3), y(instants3), 'ro'); xlim([0 1000]);
+    
+% Exemplo de Construtor
+% a = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', ...
+%     5, 'DampingFactor', 0.5, 'NormalizedLoopBandwidth', 0.005, 'DetectorGain', 2)    
     
 # [EOF]    
