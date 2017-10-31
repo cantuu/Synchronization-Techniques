@@ -5,7 +5,7 @@
 clear all; close all; clc;
 
 N = 1000;
-sps = 7;
+sps = 5;
 SNR = 100;
 
 Rs = 1.0;
@@ -26,7 +26,11 @@ y = upfirdn(r, h, 1, 1);                        #Raised Cosine Rx Filter
 y = y(1:N*sps);
 
                                                 #Symbol Synchronizer
-comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps);
+#comm = SymbolSynchronizer('SamplesPerSymbol', sps); #Zero-Crossing
+#comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
+comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps); #Gardner
+#comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps); #Early-late
+
 instants3 = step(comm, y);              
 
 
