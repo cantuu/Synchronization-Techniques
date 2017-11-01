@@ -54,19 +54,29 @@ classdef SymbolSynchronizer
       switch obj.TimingErrorDetector 
         case 'Mueller & Muller'
           obj.TEDpointer = mueller_muller(obj, y);
+          printf("MM\n")
         case 'Gardner'
           obj.TEDpointer = gardner(obj, y);
         case 'Early-Late'
           obj.TEDpointer = early_late(obj, y);
         case 'Zero-Crossing'
           obj.TEDpointer = zero_crossing(obj, y);  
-          printf("oi\n")
+          printf("ZC\n")
         otherwise
           s = error("Synchronizer does not exist");  
       end
       
       s = obj.TEDpointer;
     end 
+    
+    function reset(obj)
+      obj.TimingErrorDetector = 'Zero-Crossing';
+      obj.DampingFactor = 1;
+      obj.NormalizedLoopBandwidth = 0.01;
+      obj.DetectorGain = 2.7;
+      obj.SamplesPerSymbol = 2;
+
+    end
         
     function instants = mueller_muller(obj, y)
       k=0; tau_hat=0; instants=[];
@@ -76,7 +86,7 @@ classdef SymbolSynchronizer
       damp = obj.DampingFactor;
 %      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
 %      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
-      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp)
+      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
       alpha = (4*damp*theta)/(1 + 2*damp*theta + theta*theta); #K1
       beta = (4*theta*theta)/(1 + 2*damp*theta + theta*theta); #K2      
       
@@ -125,7 +135,7 @@ classdef SymbolSynchronizer
       damp = obj.DampingFactor;
 %      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
 %      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);      
-      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp)
+      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
       alpha = (4*damp*theta)/(1 + 2*damp*theta + theta*theta); #K1
       beta = (4*theta*theta)/(1 + 2*damp*theta + theta*theta); #K2
       amostras = 3;  
@@ -148,7 +158,7 @@ classdef SymbolSynchronizer
       damp = obj.DampingFactor;
 %      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
 %      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
-      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp)
+      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
       alpha = (4*damp*theta)/(1 + 2*damp*theta + theta*theta); #K1
       beta = (4*theta*theta)/(1 + 2*damp*theta + theta*theta); #K2
       
