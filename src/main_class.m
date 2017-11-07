@@ -4,8 +4,8 @@
 
 clear all; close all; clc;
 
-N = 1000;
-sps = 5;
+N = 2000;
+sps = 4;
 SNR = 100;
 
 Rs = 1.0;
@@ -22,29 +22,31 @@ tx_signal = 2*bits - 1;                         #BPSK Modulation
 x = upfirdn(tx_signal, h, sps, 1);              #Raised Cosine Tx Filter 
 r = awgn(x, SNR, 'measured');                   #Add Noise
 
+r = [0 0 0 r];
+
 y = upfirdn(r, h, 1, 1);                        #Raised Cosine Rx Filter
 y = y(1:N*sps);
                                                 #Symbol Synchronizer
-comm = SymbolSynchronizer('SamplesPerSymbol', sps); #Zero-Crossing
-#comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
-#comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps); #Gardner
-#comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps); #Early-late
-
-instants3 = step(comm, y);              
-
-plot(t, y); xlim([0 1000]); grid on;
-hold on;
-plot(t(instants3), y(instants3), 'ro'); xlim([0 1000]);
-
-reset(comm);
-
+%comm = SymbolSynchronizer('SamplesPerSymbol', sps); #Zero-Crossing
 comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps); #Gardner
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps); #Early-late
+
 instants3 = step(comm, y);              
 
-figure(2)
-plot(t, y); xlim([0 1000]); grid on;
+plot(t, y); #xlim([0 1000]); grid on;
 hold on;
-plot(t(instants3), y(instants3), 'ro'); xlim([0 1000]);
+plot(t(instants3), y(instants3), 'ro'); #xlim([0 1000]);
+
+%reset(comm);
+%
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
+%instants3 = step(comm, y);              
+%
+%figure(2)
+%plot(t, y); xlim([0 1000]); grid on;
+%hold on;
+%plot(t(instants3), y(instants3), 'ro'); xlim([0 1000]);
     
 % Exemplo de Construtor
 % a = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', ...
