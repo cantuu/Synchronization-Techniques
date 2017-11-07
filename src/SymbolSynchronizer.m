@@ -27,7 +27,9 @@ classdef SymbolSynchronizer
   end
   
   properties(Access = private)
-    TEDpointer
+    ErrPointer;
+    i;
+    tau_hat;
   end
   
 
@@ -51,22 +53,7 @@ classdef SymbolSynchronizer
     end
   
     function s = step(obj, y)
-      switch obj.TimingErrorDetector 
-        case 'Mueller & Muller'
-          obj.TEDpointer = mueller_muller(obj, y);
-          printf("MM\n")
-        case 'Gardner'
-          obj.TEDpointer = gardner(obj, y);
-        case 'Early-Late'
-          obj.TEDpointer = early_late(obj, y);
-        case 'Zero-Crossing'
-          obj.TEDpointer = zero_crossing(obj, y);  
-          printf("ZC\n")
-        otherwise
-          s = error("Synchronizer does not exist");  
-      end
-      
-      s = obj.TEDpointer;
+      s = obj.TED(y);
     end 
     
     function reset(obj)
@@ -75,83 +62,48 @@ classdef SymbolSynchronizer
       obj.NormalizedLoopBandwidth = 0.01;
       obj.DetectorGain = 2.7;
       obj.SamplesPerSymbol = 2;
-
     end
-        
-    function instants = mueller_muller(obj, y)
-      k=0; tau_hat=0; instants=[];
-      i = obj.SamplesPerSymbol + 1;
-      
+    
+    function instants = TED(obj, y)
+      k=0; instants = [];
+      obj.i = obj.SamplesPerSymbol + 1;
+      obj.tau_hat = 0;
       bw = obj.NormalizedLoopBandwidth;
       damp = obj.DampingFactor;
-%      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
-%      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
+      
       theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
-<<<<<<< HEAD
       alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
       beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
-=======
-      alpha = (4*damp*theta)/(1 + 2*damp*theta + theta*theta); #K1
-      beta = (4*theta*theta)/(1 + 2*damp*theta + theta*theta); #K2      
->>>>>>> parent of ad27e1c... Code Optimization - Delay added to original Signal
       
       while k <= length(y) - 2*obj.SamplesPerSymbol
-        k = round(i+tau_hat);
-        k1 = round(i+tau_hat-obj.SamplesPerSymbol);
-        e = (sign(y(k1))*y(k)) - (sign(y(k))*y(k1));
+        k = round(obj.i + obj.tau_hat);
+        k1 = round(obj.i + obj.tau_hat - obj.SamplesPerSymbol);
+        e = obj.TEDChooser(y, k, k1);
         obj.SamplesPerSymbol += e*beta;
-<<<<<<< HEAD
         obj.tau_hat += e*alpha;
-=======
-        tau_hat += beta + e*alpha;
->>>>>>> parent of ad27e1c... Code Optimization - Delay added to original Signal
         instants = [instants k];
-        i += obj.SamplesPerSymbol;
+        obj.i += obj.SamplesPerSymbol;
       end
       printf("%f\n", obj.tau_hat)
       printf("%f\n", obj.SamplesPerSymbol)
     end
     
-    function instants = gardner(obj, y)
-      k=0; tau_hat=0; instants=[]; 
-      i = obj.SamplesPerSymbol + 1;
-      
-      bw = obj.NormalizedLoopBandwidth;
-      damp = obj.DampingFactor;
-%      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
-%      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
-      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
-      alpha = (4*damp*theta)/(1 + 2*damp*theta + theta*theta); #K1
-      beta = (4*theta*theta)/(1 + 2*damp*theta + theta*theta); #K2
-      
-      while k <= length(y) - 2*obj.SamplesPerSymbol
-        k = round(i + tau_hat);
-        k1 = round(i + tau_hat - obj.SamplesPerSymbol);
-        #k_half = ((k1 + k)/2);
-        #e = (y(k1) - y(k)) * y(round(k_half));
-        k_half = round(i + tau_hat - obj.SamplesPerSymbol/2);
-        e = (y(k)-y(k1)) * (y(k_half));
-        obj.SamplesPerSymbol += e*beta;
-        tau_hat += beta + e*alpha;
-        instants = [instants k];
-        i += obj.SamplesPerSymbol;
+    function e = TEDChooser(obj, y, k, k1)
+
+      switch obj.TimingErrorDetector 
+        case 'Zero-Crossing'
+          obj.ErrPointer = TEDZeroCrossing(obj, y, k, k1);  
+        case 'Mueller & Muller'
+          obj.ErrPointer = TEDMuellerMuller(obj, y, k, k1);
+        case 'Gardner'
+          obj.ErrPointer = TEDGardner(obj, y, k, k1);
+        case 'Early-Late'
+          samples = 3;
+          obj.ErrPointer = TEDEarlyLate(obj, y, k, samples);
+        otherwise
+          e = error("Synchronizer does not exist");  
       end
-    end    
-
-    function instants = early_late(obj, y)
-      instants = []; tau_hat = 0; k = 0;
-      i = obj.SamplesPerSymbol  + 1;    
-
-      bw = obj.NormalizedLoopBandwidth;
-      damp = obj.DampingFactor;
-%      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
-%      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);      
-      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
-      alpha = (4*damp*theta)/(1 + 2*damp*theta + theta*theta); #K1
-      beta = (4*theta*theta)/(1 + 2*damp*theta + theta*theta); #K2
-      amostras = 3;  
       
-<<<<<<< HEAD
       e = obj.ErrPointer;
     end
     
@@ -177,41 +129,6 @@ classdef SymbolSynchronizer
     function KHalf = KMiddle(obj)
       KHalf = obj.i + obj.tau_hat - obj.SamplesPerSymbol/2;
     end
-=======
-      while k <=  length(y) - 2*obj.SamplesPerSymbol
-        k = round(i + tau_hat);
-        e = abs(y(k+amostras)) - abs(y(k-amostras));
-        obj.SamplesPerSymbol += e*beta;
-        tau_hat += beta + e*alpha;
-        instants = [instants k];
-        i += obj.SamplesPerSymbol;
-      end
-    end
-    
-    function instants = zero_crossing(obj, y)
-      k=0; tau_hat=0; instants=[]; 
-      i = obj.SamplesPerSymbol + 1;
-      
-      bw = obj.NormalizedLoopBandwidth;
-      damp = obj.DampingFactor;
-%      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
-%      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
-      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
-      alpha = (4*damp*theta)/(1 + 2*damp*theta + theta*theta); #K1
-      beta = (4*theta*theta)/(1 + 2*damp*theta + theta*theta); #K2
-      
-      while k <= length(y) - 2*obj.SamplesPerSymbol
-        k = round(i + tau_hat);
-        k1 = round(i + tau_hat - obj.SamplesPerSymbol);
-        k_half = round(i + tau_hat - obj.SamplesPerSymbol/2);
-        e = (sign(y(k1)) - (sign(y(k)))) * y(k_half);
-        obj.SamplesPerSymbol += e*beta;
-        tau_hat += beta + e*alpha;
-        instants = [instants k];
-        i += obj.SamplesPerSymbol;
-      end
-    end    
->>>>>>> parent of ad27e1c... Code Optimization - Delay added to original Signal
     
   end % methods
   

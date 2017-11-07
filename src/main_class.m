@@ -4,15 +4,9 @@
 
 clear all; close all; clc;
 
-<<<<<<< HEAD
 N = 50000;
 sps = 50;
 SNR = 1000;
-=======
-N = 1000;
-sps = 5;
-SNR = 100;
->>>>>>> parent of ad27e1c... Code Optimization - Delay added to original Signal
 
 Rs = 1.0;
 Fa = Rs*sps;
@@ -28,7 +22,6 @@ tx_signal = 2*bits - 1;                         #BPSK Modulation
 x = upfirdn(tx_signal, h, sps, 1);              #Raised Cosine Tx Filter 
 r = awgn(x, SNR, 'measured');                   #Add Noise
 
-<<<<<<< HEAD
 r = [0 0 0 0 r];
 
 y = upfirdn(r, h, 1, 1);                        #Raised Cosine Rx Filter
@@ -38,31 +31,22 @@ y = y(1:N*sps);
 %comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
 %comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps, 'NormalizedLoopBandwidth', 0.01); #Gardner
 comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps*1.001); #Early-late
-=======
-y = upfirdn(r, h, 1, 1);                        #Raised Cosine Rx Filter
-y = y(1:N*sps);
-                                                #Symbol Synchronizer
-comm = SymbolSynchronizer('SamplesPerSymbol', sps); #Zero-Crossing
-#comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
-#comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps); #Gardner
-#comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps); #Early-late
 
 instants3 = step(comm, y);              
->>>>>>> parent of ad27e1c... Code Optimization - Delay added to original Signal
 
-plot(t, y); xlim([0 1000]); grid on;
+plot(t, y); #xlim([0 1000]); grid on;
 hold on;
-plot(t(instants3), y(instants3), 'ro'); xlim([0 1000]);
+plot(t(instants3), y(instants3), 'ro'); #xlim([0 1000]);
 
-reset(comm);
-
-comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
-instants3 = step(comm, y);              
-
-figure(2)
-plot(t, y); xlim([0 1000]); grid on;
-hold on;
-plot(t(instants3), y(instants3), 'ro'); xlim([0 1000]);
+%reset(comm);
+%
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
+%instants3 = step(comm, y);              
+%
+%figure(2)
+%plot(t, y); xlim([0 1000]); grid on;
+%hold on;
+%plot(t(instants3), y(instants3), 'ro'); xlim([0 1000]);
     
 % Exemplo de Construtor
 % a = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', ...
