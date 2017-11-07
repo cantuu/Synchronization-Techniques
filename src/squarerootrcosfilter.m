@@ -1,10 +1,10 @@
 % Adapted from Mathuranathan Viswanathan. The original code can be found in:
 % <https://www.gaussianwaves.com/2011/04/square-root-raised-cosine-filter-matchedsplit-filter-implementation-2/>
 
-function response=squarerootrcosfilter(roll_off, spam, sps)
+function response=squarerootrcosfilter(roll_off, span, sps)
    
   a=roll_off;
-  t=-spam:1/sps:spam;
+  t=-span:1/sps:span;
 
   p=zeros(1,length(t));
   for i=1:1:length(t)
