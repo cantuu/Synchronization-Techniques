@@ -84,8 +84,8 @@ classdef SymbolSynchronizer
         instants = [instants k];
         obj.i += obj.SamplesPerSymbol;
       end
-      printf("%f\n", obj.tau_hat)
-      printf("%f\n", obj.SamplesPerSymbol)
+#      printf("%f\n", obj.tau_hat)
+#      printf("%f\n", obj.SamplesPerSymbol)
     end
     
     function e = TEDChooser(obj, y, k, k1)
@@ -117,7 +117,7 @@ classdef SymbolSynchronizer
     
     function e = TEDGardner(obj, y, k, k1)
       k_half = (k+k1)/2; #obj.KMiddle;
-      e = (y(k)-y(k1)) * y(round(k_half));      
+      e = (y(k1)-y(k)) * y(round(k_half));      
     end
     
     function e = TEDZeroCrossing(obj, y, k, k1)
