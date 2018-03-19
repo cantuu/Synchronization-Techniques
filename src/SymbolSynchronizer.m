@@ -88,6 +88,14 @@ classdef SymbolSynchronizer
 #      printf("%f\n", obj.SamplesPerSymbol)
     end
     
+%    function samp = interpolator(obj, y, inst, span)
+%      current_inst = round(inst);
+%      offset_inst = inst - current_inst;
+%      h = srrc(span, 0, 1, offset_inst);
+%      y_hat = conv(y(current_inst-span:current_inst+span), h);
+%      samp = y_hat(2*span+1);
+%    end  
+    
     function e = TEDChooser(obj, y, k, k1)
 
       switch obj.TimingErrorDetector 
