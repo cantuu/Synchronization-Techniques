@@ -88,13 +88,23 @@ classdef SymbolSynchronizer
 #      printf("%f\n", obj.SamplesPerSymbol)
     end
     
-%    function samp = interpolator(obj, y, inst, span)
-%      current_inst = round(inst);
-%      offset_inst = inst - current_inst;
-%      h = srrc(span, 0, 1, offset_inst);
-%      y_hat = conv(y(current_inst-span:current_inst+span), h);
-%      samp = y_hat(2*span+1);
-%    end  
+    function h = srrc(span, rolloff, oversamp, offset)
+      if (rolloff == 0)
+        beta=1e-8; 
+      end;
+      k = -span*oversamp+1e-8+offset:span*oversamp+1e-8+offset;
+      s = 4*rolloff/sqrt(oversamp) * cos((1+rolloff)*pi*k/oversamp) +...
+          sin((1-rolloff)*pi*k/oversamp) ./ (4*rolloff*k/oversamp) ./...
+          (pi*(1-16*(rolloff*k/oversamp).^2)); 
+    end  
+    
+    function samp = interpolator(obj, y, inst, span)
+      current_inst = round(inst);
+      offset_inst = inst - current_inst;
+      h = srrc(span, 0, 1, offset_inst);
+      y_hat = conv(y(current_inst-span:current_inst+span), h);
+      samp = y_hat(2*span+1);
+    end  
     
     function e = TEDChooser(obj, y, k, k1)
 
