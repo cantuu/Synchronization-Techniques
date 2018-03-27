@@ -4,59 +4,37 @@
 
 clear all; close all; clc;
 
-N = 50000;
-sps = 40;
-SNR = 100;
+N = 4000;
+tx = 2*randi([0,1], 1, N) - 1;
 
-Rs = 1.0;
-Fa = Rs*sps;
-t = (0: N*sps-1)/Fa;
+sps = 10;
+rolloff = 0.5;
+l = 50;
+offset = 0;
 
-span = 20;
-rolloff = 0.25;
+h = srrc(l, rolloff, sps, offset);
+r = upfirdn(tx, h, sps, 1);
 
-h = squarerootrcosfilter(rolloff, span, sps);   #Raised Cosine FIR Filter design
-bits = randi([0 1], 1, N);                      #Random Data
-tx_signal = 2*bits - 1;                         #BPSK Modulation
+r = awgn(r, 100, 'measured');
+r = [zeros(1,3) r];
 
-x = upfirdn(tx_signal, h, sps, 1);              #Raised Cosine Tx Filter 
-r = awgn(x, SNR, 'measured');                   #Add Noise
-
-r = [0 0 0 0 r];
-
-y = upfirdn(r, h, 1, 1);                        #Raised Cosine Rx Filter
-y = y(1:N*sps);
+matched = srrc(l, rolloff, sps, 0);
+y = upfirdn(r, matched, 1, 1);
                                                 #Symbol Synchronizer
-comm = SymbolSynchronizer('SamplesPerSymbol', sps, 'NormalizedLoopBandwidth', 0.005); #Zero-Crossing
-comm1 = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
-comm2 = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps, 'NormalizedLoopBandwidth', 0.01); #Gardner
-comm3 = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps*1.001); #Early-late
+%comm = SymbolSynchronizer('SamplesPerSymbol', sps, 'NormalizedLoopBandwidth', 0.01); #Zero-Crossing
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps, 'NormalizedLoopBandwidth', 0.01); #Gardner
+comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps); #Early-late
 
-instants = step(comm, y);
-instants1 = step(comm1, y);              
-instants2 = step(comm2, y);              
-instants3 = step(comm3, y);              
+set_span(comm, l);
+
+[instants, TNOW] = step(comm, y);
+%instants1 = step(comm1, y);              
+%instants2 = step(comm2, y);              
+%instants3 = step(comm3, y);
+
+plot(y); hold on; plot(TNOW, instants, 'r*')
               
-
-subplot(221)
-plot(t, y); #xlim([0 1000]); grid on;
-hold on; plot(t(instants), y(instants), 'ro'); #xlim([0 1000]);
-title('Zero-Crossing')
-
-subplot(222)
-plot(t, y); #xlim([0 1000]); grid on;
-hold on; plot(t(instants1), y(instants1), 'ro'); #xlim([0 1000]);
-title('Mueller & Muller')
-
-subplot(223)
-plot(t, y); #xlim([0 1000]); grid on;
-hold on; plot(t(instants2), y(instants2), 'ro'); #xlim([0 1000]);
-title('Gardner')
-
-subplot(224)
-plot(t, y); #xlim([0 1000]); grid on;
-hold on; plot(t(instants3), y(instants3), 'ro'); #xlim([0 1000]);
-title('Early-Late')
 
 %reset(comm);
 %

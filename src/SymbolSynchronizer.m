@@ -17,6 +17,7 @@ classdef SymbolSynchronizer
     DampingFactor = 1;
     NormalizedLoopBandwidth = 0.01;
     DetectorGain = 2.7;
+    Span = 50;
   end
   
   properties(Constant, Hidden)
@@ -28,7 +29,7 @@ classdef SymbolSynchronizer
   
   properties(Access = private)
     ErrPointer;
-    i;
+    tnow;
     tau_hat;
   end
   
@@ -52,9 +53,13 @@ classdef SymbolSynchronizer
       end  
     end
   
-    function s = step(obj, y)
-      s = obj.TED(y);
-    end 
+    function [s, t] = step(obj, y)
+      [s,t] = obj.TED(y);
+    end
+   
+    function set_span(obj, span)
+      obj.Span = span;
+    end
     
     function reset(obj)
       obj.TimingErrorDetector = 'Zero-Crossing';
@@ -64,60 +69,85 @@ classdef SymbolSynchronizer
       obj.SamplesPerSymbol = 2;
     end
     
-    function instants = TED(obj, y)
-      k=0; instants = [];
-      obj.i = obj.SamplesPerSymbol + 1;
+    function [instants time_instants] = TED(obj, y)
+      instants = []; ret = [];
+      obj.tnow = obj.Span*obj.SamplesPerSymbol + 1;
       obj.tau_hat = 0;
       bw = obj.NormalizedLoopBandwidth;
       damp = obj.DampingFactor;
       
-      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
       alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
       beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
       
-      while k <= length(y) - 2*obj.SamplesPerSymbol
-        k = round(obj.i + obj.tau_hat);
-        k1 = round(obj.i + obj.tau_hat - obj.SamplesPerSymbol);
-        e = obj.TEDChooser(y, k, k1);
+      while obj.tnow < length(y) - obj.Span*obj.SamplesPerSymbol
+        obj.tnow += obj.SamplesPerSymbol;
+        ret = [ret obj.tnow+obj.tau_hat];
+        xs = obj.interpolator(y, obj.tnow+obj.tau_hat, obj.Span);
+        xb = obj.interpolator(y, obj.tnow+obj.tau_hat-obj.SamplesPerSymbol, obj.Span);
+%        e = (sign(xb)*xs) - (sign(xs)*xb);
+        e = obj.TEDChooser(y, xs, xb);
         obj.SamplesPerSymbol += e*beta;
         obj.tau_hat += e*alpha;
-        instants = [instants k];
-        obj.i += obj.SamplesPerSymbol;
+        instants = [instants xs];
+        
       end
-#      printf("%f\n", obj.tau_hat)
-#      printf("%f\n", obj.SamplesPerSymbol)
+      time_instants = ret;
     end
+    
+%    function instants = TED(obj, y)
+%      k=0; instants = [];
+%      obj.i = obj.SamplesPerSymbol + 1;
+%      obj.tau_hat = 0;
+%      bw = obj.NormalizedLoopBandwidth;
+%      damp = obj.DampingFactor;
+%      
+%      theta = bw/obj.SamplesPerSymbol/(damp + 0.25/damp);
+%      alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
+%      beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
+%      
+%      while k <= length(y) - 2*obj.SamplesPerSymbol
+%        k = round(obj.i + obj.tau_hat);
+%        k1 = round(obj.i + obj.tau_hat - obj.SamplesPerSymbol);
+%        e = obj.TEDChooser(y, k, k1);
+%        obj.SamplesPerSymbol += e*beta;
+%        obj.tau_hat += e*alpha;
+%        instants = [instants k];
+%        obj.i += obj.SamplesPerSymbol;
+%      end
+%#      printf("%f\n", obj.tau_hat)
+%#      printf("%f\n", obj.SamplesPerSymbol)
+%    end
     
     function h = srrc(span, rolloff, oversamp, offset)
       if (rolloff == 0)
         beta=1e-8; 
       end;
       k = -span*oversamp+1e-8+offset:span*oversamp+1e-8+offset;
-      s = 4*rolloff/sqrt(oversamp) * cos((1+rolloff)*pi*k/oversamp) +...
-          sin((1-rolloff)*pi*k/oversamp) ./ (4*rolloff*k/oversamp) ./...
-          (pi*(1-16*(rolloff*k/oversamp).^2)); 
+      s=4*rolloff/sqrt(oversamp)*(cos((1+rolloff)*pi*k/oversamp)+ ...      
+        sin((1-rolloff)*pi*k/oversamp)./(4*rolloff*k/oversamp))./ ...
+        (pi*(1-16*(rolloff*k/oversamp).^2));
     end  
     
     function samp = interpolator(obj, y, inst, span)
-      current_inst = round(inst);
-      offset_inst = inst - current_inst;
-      h = srrc(span, 0, 1, offset_inst);
-      y_hat = conv(y(current_inst-span:current_inst+span), h);
+      current = round(inst);
+      offset = inst - current;
+      h = srrc(span, 0, 1, offset);
+      y_hat = conv(y(current-span:current+span), h);
       samp = y_hat(2*span+1);
     end  
     
-    function e = TEDChooser(obj, y, k, k1)
+    function e = TEDChooser(obj, y, xs, xb)
 
       switch obj.TimingErrorDetector 
         case 'Zero-Crossing'
-          obj.ErrPointer = TEDZeroCrossing(obj, y, k, k1);  
+          obj.ErrPointer = TEDZeroCrossing(obj, y, xs, xb);  
         case 'Mueller & Muller'
-          obj.ErrPointer = TEDMuellerMuller(obj, y, k, k1);
+          obj.ErrPointer = TEDMuellerMuller(obj, y, xs, xb);
         case 'Gardner'
-          obj.ErrPointer = TEDGardner(obj, y, k, k1);
+          obj.ErrPointer = TEDGardner(obj, y, xs, xb);
         case 'Early-Late'
           samples = 3;
-          obj.ErrPointer = TEDEarlyLate(obj, y, k, samples);
+          obj.ErrPointer = TEDEarlyLate(obj, y, samples);
         otherwise
           e = error("Synchronizer does not exist");  
       end
@@ -125,27 +155,29 @@ classdef SymbolSynchronizer
       e = obj.ErrPointer;
     end
     
-    function e = TEDMuellerMuller(obj, y, k, k1)
-      e = (sign(y(k1))*y(k)) - (sign(y(k))*y(k1));
+    function e = TEDMuellerMuller(obj, y, xs, xb)
+      %e = (sign(y(k1))*y(k)) - (sign(y(k))*y(k1));
+      e = (sign(xb)*xs) - (sign(xs)*xb);
     end 
     
-    function e = TEDEarlyLate(obj, y, k, amostras)
-      e = abs(y(k+amostras)) - abs(y(k-amostras));
+    function e = TEDEarlyLate(obj, y, amostras)
+      xs = obj.interpolator(y, obj.tnow+obj.tau_hat+amostras, obj.Span);
+      xb = obj.interpolator(y, obj.tnow+obj.tau_hat-amostras, obj.Span);
+      e = abs(xs) - abs(xb);
     end
     
-    function e = TEDGardner(obj, y, k, k1)
-      k_half = (k+k1)/2; #obj.KMiddle;
-      e = (y(k1)-y(k)) * y(round(k_half));      
+    function e = TEDGardner(obj, y, xs, xb)
+      xh = obj.KMiddle(y);
+      e = (xb-xs) * xh;      
     end
     
-    function e = TEDZeroCrossing(obj, y, k, k1)
-      #k_half = obj.KMiddle;
-      k_half = (k+k1)/2;
-      e = (sign(y(k1)) - sign(y(k))) * y(round(k_half));
+    function e = TEDZeroCrossing(obj, y, xs, xb)
+      xh = obj.KMiddle(y);
+      e = (sign(xb) - sign(xs)) * xh;
     end
         
-    function KHalf = KMiddle(obj)
-      KHalf = obj.i + obj.tau_hat - obj.SamplesPerSymbol/2;
+    function XHalf = KMiddle(obj, y)
+      XHalf = obj.interpolator(y, obj.tnow+obj.tau_hat-(obj.SamplesPerSymbol/2), obj.Span);
     end
     
   end % methods
