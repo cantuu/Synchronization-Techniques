@@ -10,6 +10,7 @@ tx = 2*randi([0,1], 1, N) - 1;
 sps = 10;
 rolloff = 0.5;
 l = 50;
+%offset = 1;
 offset = 0;
 
 h = srrc(l, rolloff, sps, offset);
@@ -20,20 +21,28 @@ r = [zeros(1,3) r];
 
 matched = srrc(l, rolloff, sps, 0);
 y = upfirdn(r, matched, 1, 1);
-                                                #Symbol Synchronizer
-%comm = SymbolSynchronizer('SamplesPerSymbol', sps, 'NormalizedLoopBandwidth', 0.01); #Zero-Crossing
-%comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller & Muller', 'SamplesPerSymbol', sps); #Mueller & Muller
-%comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner', 'SamplesPerSymbol', sps, 'NormalizedLoopBandwidth', 0.01); #Gardner
-comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late', 'SamplesPerSymbol', sps); #Early-late
 
-set_span(comm, l);
+sps = sps*1.001;
 
-[instants, TNOW] = step(comm, y);
+%comm = SymbolSynchronizer('SamplesPerSymbol', sps*1.001, 'NormalizedLoopBandwidth', 0.01, ...
+%                          'RolloffFactor', rolloff, 'FilterSpanInSymbols', l); %Zero-Crossing
+
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Mueller-Muller (decision-directed)', 'SamplesPerSymbol', sps,...
+%                          'RolloffFactor', rolloff, 'FilterSpanInSymbols', l); %Mueller & Muller
+
+
+%comm = SymbolSynchronizer('TimingErrorDetector', 'Gardner (non-data-aided)', 'SamplesPerSymbol', sps, ...
+%                          'RolloffFactor', rolloff, 'FilterSpanInSymbols', l); %Gardner
+                          
+comm = SymbolSynchronizer('TimingErrorDetector', 'Early-Late (non-data-aided)', 'SamplesPerSymbol', sps, ...
+                          'RolloffFactor', rolloff, 'FilterSpanInSymbols', l); %Early-late
+
+[xs, t] = step(comm, y);
 %instants1 = step(comm1, y);              
 %instants2 = step(comm2, y);              
 %instants3 = step(comm3, y);
 
-plot(y); hold on; plot(TNOW, instants, 'r*')
+plot(y); hold on; plot(t, xs, 'r*')
               
 
 %reset(comm);
