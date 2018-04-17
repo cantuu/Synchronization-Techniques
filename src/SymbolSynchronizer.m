@@ -19,6 +19,7 @@ classdef SymbolSynchronizer
     DetectorGain = 2.7;
     RolloffFactor = 0.2;
     FilterSpanInSymbols = 10;
+    Srrc = SquareRootRaisedCosineFilter();
   end
   
   properties(Constant, Hidden)
@@ -54,6 +55,8 @@ classdef SymbolSynchronizer
           obj.RolloffFactor = varargin{i+1};
         elseif(strcmp(varargin{i}, 'FilterSpanInSymbols'))
           obj.FilterSpanInSymbols = varargin{i+1};  
+        elseif(strcmp(varargin{i}, 'SRRCFilter'))
+          obj.Srrc = varargin{i+1};  
         end  
       end  
     end
@@ -99,6 +102,9 @@ classdef SymbolSynchronizer
       current = round(inst);
       offset = inst - current;
       h = obj.srrc(1, offset);
+      %obj.Srrc.DecimationFactor = 1;
+      %obj.Srrc.DecimationOffset = offset;
+      %h = obj.Srrc.step();
       y_hat = conv(y(current-span:current+span), h);
       samp = y_hat(2*span+1);
     end 
