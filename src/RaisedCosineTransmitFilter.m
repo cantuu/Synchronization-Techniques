@@ -1,22 +1,21 @@
-classdef SquareRootRaisedCosineFilter #< handle
+classdef RaisedCosineTransmitFilter #< handle
 
   properties
     RolloffFactor = 0.2;
     FilterSpanInSymbols = 10;
-    DecimationOffset = -1;
-    DecimationFactor = 8;
+    OutputSamplesPerSymbol = 8;
   end
   
   methods
   
-    function obj = SquareRootRaisedCosineFilter(varargin)
+    function obj = RaisedCosineTransmitFilter(varargin)
       for i = 1:length(varargin)
         if(strcmp(varargin{i}, 'RolloffFactor'))
           obj.RolloffFactor = varargin{i+1};
         elseif(strcmp(varargin{i}, 'FilterSpanInSymbols'))
           obj.FilterSpanInSymbols = varargin{i+1};  
-        elseif(strcmp(varargin{i}, 'DecimationFactor'))
-          obj.DecimationFactor = varargin{i+1};  
+        elseif(strcmp(varargin{i}, 'OutputSamplesPerSymbol'))
+          obj.OutputSamplesPerSymbol = varargin{i+1};  
         elseif(strcmp(varargin{i}, 'DecimationOffset'))
           obj.DecimationOffset = varargin{i+1};  
         end  
@@ -26,8 +25,8 @@ classdef SquareRootRaisedCosineFilter #< handle
     function h = step(obj)
       rolloff = obj.RolloffFactor;
       span = obj.FilterSpanInSymbols;
-      offset = obj.DecimationOffset;
-      oversamp = obj.DecimationFactor;
+      offset = 0;
+      oversamp = obj.OutputSamplesPerSymbol;
       
       if (rolloff == 0)
           rolloff=1e-8; 
@@ -41,8 +40,7 @@ classdef SquareRootRaisedCosineFilter #< handle
     function reset(obj)
       obj.RolloffFactor = 0.2;
       obj.FilterSpanInSymbols = 10;
-      obj.DecimationOffset = -1;
-      obj.DecimationFactor = 8;
+      obj.OutputSamplesPerSymbol = 8;
     end  
   
   end %methods

@@ -19,7 +19,6 @@ classdef SymbolSynchronizer
     DetectorGain = 2.7;
     RolloffFactor = 0.2;
     FilterSpanInSymbols = 10;
-    Srrc = SquareRootRaisedCosineFilter();
   end
   
   properties(Constant, Hidden)
@@ -55,8 +54,6 @@ classdef SymbolSynchronizer
           obj.RolloffFactor = varargin{i+1};
         elseif(strcmp(varargin{i}, 'FilterSpanInSymbols'))
           obj.FilterSpanInSymbols = varargin{i+1};  
-        elseif(strcmp(varargin{i}, 'SRRCFilter'))
-          obj.Srrc = varargin{i+1};  
         end  
       end  
     end
@@ -101,24 +98,21 @@ classdef SymbolSynchronizer
       span = obj.FilterSpanInSymbols;
       current = round(inst);
       offset = inst - current;
-      h = obj.srrc(1, offset);
-      %obj.Srrc.DecimationFactor = 1;
-      %obj.Srrc.DecimationOffset = offset;
-      %h = obj.Srrc.step();
+      h = obj.srrc(offset);
       y_hat = conv(y(current-span:current+span), h);
       samp = y_hat(2*span+1);
     end 
     
-    function h = srrc(obj, oversamp, offset)
+    function h = srrc(obj, offset)
       rolloff = obj.RolloffFactor;
       span = obj.FilterSpanInSymbols;
       if (rolloff == 0)
-        beta=1e-8; 
+        rolloff=1e-8; 
       end;
-      k = -span*oversamp+1e-8+offset:span*oversamp+1e-8+offset;
-      h=4*rolloff/sqrt(oversamp)*(cos((1+rolloff)*pi*k/oversamp)+ ...      
-        sin((1-rolloff)*pi*k/oversamp)./(4*rolloff*k/oversamp))./ ...
-        (pi*(1-16*(rolloff*k/oversamp).^2));
+      k = -span+1e-8+offset:span+1e-8+offset;
+      h=4*rolloff*(cos((1+rolloff)*pi*k)+ ...      
+        sin((1-rolloff)*pi*k)./(4*rolloff*k))./ ...
+        (pi*(1-16*(rolloff*k).^2));
     end   
     
     function e = TEDChooser(obj, y, xs, xb)
