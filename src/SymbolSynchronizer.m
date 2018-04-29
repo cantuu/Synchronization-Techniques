@@ -70,8 +70,9 @@ classdef SymbolSynchronizer
       obj.SamplesPerSymbol = 2;
     end
     
-    function [instants time_instants] = TED(obj, y)
-      instants = []; ret = [];
+    function [corrected_sig timing_error] = TED(obj, y)
+      corrected_sig = []; 
+      te = [];
       obj.tnow = obj.FilterSpanInSymbols*obj.SamplesPerSymbol + 1;
       obj.tau_hat = 0;
       bw = obj.NormalizedLoopBandwidth;
@@ -79,19 +80,20 @@ classdef SymbolSynchronizer
       
       alpha = (4*damp*bw)/(1 + 2*damp*bw + bw*bw);
       beta = (4*bw*bw)/(1 + 2*damp*bw + bw*bw);
-      
       while obj.tnow < length(y) - obj.FilterSpanInSymbols*obj.SamplesPerSymbol
         obj.tnow += obj.SamplesPerSymbol;
-        ret = [ret obj.tnow+obj.tau_hat];
+        
+        
+        te = [te obj.tnow+obj.tau_hat];
         xs = obj.interpolator(y, obj.tnow+obj.tau_hat);
         xb = obj.interpolator(y, obj.tnow+obj.tau_hat-obj.SamplesPerSymbol);
         e = obj.TEDChooser(y, xs, xb);
         obj.SamplesPerSymbol += e*beta;
         obj.tau_hat += e*alpha;
-        instants = [instants xs];
+        corrected_sig = [corrected_sig xs];
         
       end
-      time_instants = ret;
+      timing_error = te;
     end
     
     function samp = interpolator(obj, y, inst)

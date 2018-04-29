@@ -46,6 +46,9 @@ sps = sps*1.001;
 
 t = (1:length(y))';
 
+%ts1 = sps*(0:length(xs)-1)';% + P(sps:sps:end);
+%ts2 = P(sps:sps:end);
+
 plot(t, y); hold on; plot(P, xs, 'r*')
     
         
